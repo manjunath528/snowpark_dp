@@ -38,8 +38,18 @@ def main():
     print(f'start_date{start_date}')
     print(f'start_date{end_date}')
     date_range = pd.date_range(start=start_date, end=end_date,freq='D')
-    date_dim = pd.DataFrame(date_range,columns=['exg_rate_date'])
+    column_names = ['EXG_DT']
+    date_dim = pd.DataFrame(columns=column_names)
+    date_dim['EXG_DT']=pd.to_datetime(date_range)
+    date_dim['EXG_DT'] = date_dim["EXG_DT"].dt.date
     print(date_dim.count())
+    temp_table ="snow_exg_df"
+    session.write_pandas(date_dim,temp_table,auto_create_table = True,overwrite=True)
+    
+    existing_data = session.sql("select * from sales_dwh.source.exg_rate")
+    modified_data = session.sql('select * from SALES_DWH.SOURCE."snow_exg_df"')
+    final_data = modified_data.join(existing_data, modified_data['EXG_DT']==existing_data['EXCHANGE_RATE_DT'],join_type ='outer')
+    print(final_data.show())
 
 
 if __name__ == '__main__':

@@ -14,9 +14,9 @@ logging.basicConfig(stream=sys.stdout, level=logging. INFO, format='%(asctime)s 
 # snowpark session
 def get_snowpark_session()->Session:
     connection_parameters = {
-        "ACCOUNT" : "fogauss-tk79561",
-        "USER": "manjub28",
-        "PASSWORD": "Reddy@28",
+        "ACCOUNT" : "",
+        "USER": "",
+        "PASSWORD": "",
         "ROLE": "ACCOUNTADMIN",
         "DATABASE": "SNOWFLAKE_SAMPLE_DATA",
         "SCHEMA" : "TPCH_SF1",

@@ -14,9 +14,9 @@ logging.basicConfig(stream=sys.stdout, level=logging. INFO, format='%(asctime)s 
 # snowpark session
 def get_snowpark_session()->Session:
     connection_parameters = {
-        "ACCOUNT" : "fogauss-tk79561",
-        "USER": "manjub28",
-        "PASSWORD": "Reddy@28",
+        "ACCOUNT" : "",
+        "USER": "",
+        "PASSWORD": "",
         "ROLE": "ACCOUNTADMIN",
         "DATABASE": "SNOWFLAKE_SAMPLE_DATA",
         "SCHEMA" : "TPCH_SF1",
@@ -34,8 +34,7 @@ def main():
     df1 = pd.read_csv(eur_in_data,skiprows=1)
     df1.to_csv(local_in_path, index=False)
 
-    df2 = pd.read_csv(eur_us_data
-                      ,skiprows=1)
+    df2 = pd.read_csv(eur_us_data,skiprows=1)
     df2.to_csv(local_us_path, index=False)
 
 
