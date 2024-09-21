@@ -27,15 +27,16 @@ def filter_dataset(df, column_name, filter_criterian) -> DataFrame:
 def main() :
 #get the session object and get dataframe
     session = get_snowpark_session()
-    sales_df = session.sql("select * from sales_dwh.source.fr_sales_order")# apply filter to select only paid and delivered sale orders
+    sales_df = session.sql("select * from sales_dwh.source.in_sales_order")# apply filter to select only paid and delivered sale orders
     # select * from in_sales_order where PAYMENT_STATUS = 'Paid' and SHIPPING_S*
     paid_sales_df = filter_dataset(sales_df, 'PAYMENT_STATUS', 'Paid' )
     shipped_sales_df = filter_dataset(paid_sales_df, 'SHIPPING_STATUS','Delivered')
     # adding country and region to the data frame
     # select *, 'IN' as Country, 'APAC' as Region from in_sales_order where PAYN
-    country_sales_df = shipped_sales_df.with_column('Country',lit('FR')).with_column('Region', lit('EU'))
-    forex_df = session.sql("select * from sales_dwh.source.exg_rate")
-    sales_with_forext_df = country_sales_df.join(forex_df,country_sales_df['order_dt']==forex_df['exchange_rate_dt'],join_type='outer')
+    country_sales_df = shipped_sales_df.with_column('Country',lit('IN')).with_column('Region', lit('APAC'))
+    forex_df = session.sql("select * from sales_dwh.source.final_exg_tbl")
+    sales_with_forext_df = country_sales_df.join(forex_df,country_sales_df['order_dt']==forex_df['exg_dt'],join_type='outer')
+    print(sales_with_forext_df.show(10))
     print(f'Sales {sales_with_forext_df.count()}')
     #sales_with_forext_df. show(2)
     unique_orders = sales_with_forext_df.with_column('order_rank', rank().over(Window.partitionBy(col("order_dt")).order_by(col('_metadata_last_modified').desc()))).filter(col("order_rank")==1).select(col('SALES_ORDER_KEY').alias('unique_sales_order_key'))
@@ -51,26 +52,26 @@ def main() :
         col('Country'),
         col('Region'),
         col('ORDER_QUANTITY'),
-        lit('EUR').alias('LOCAL_CURRENCY'),
+        lit('INR').alias('LOCAL_CURRENCY'),
         col('UNIT_PRICE').alias('LOCAL_UNIT_PRICE'),
         col('PROMOTION_CODE').alias('PROMOTION_CODE'),
         col('FINAL_ORDER_AMOUNT').alias('LOCAL_TOTAL_ORDER_AMT') ,
         col('TAX_AMOUNT').alias('local_tax_amt'),
-        col('EU').alias('Exhchange_Rate'),
-        (col('FINAL_ORDER_AMOUNT')/col('EU')).alias('EU_TOTAL_ORDER_AMT'),
-        (col('TAX_AMOUNT')/col('EU')).alias('EU_TAX_AMT'),
+        col('EU2INR').alias('Exhchange_Rate'),
+        (col('FINAL_ORDER_AMOUNT')/col('EU2INR')).alias('EU_TOTAL_ORDER_AMT'),
+        (col('TAX_AMOUNT')/col('EU2INR')).alias('EU_TAX_AMT'),
         col('payment_status'),
         col('shipping_status'),
         col('payment_method'),
         col('payment_provider'),
-        col('phone').alias('contact_no'),
+        col('mobile').alias('contact_no'),
         col('shipping_address')
     )
 
-    new_table_name = "SALES_DWH.CURATED.FR_SALES_ORDER"
+    new_table_name = "SALES_DWH.CURATED.IN_SALES_ORDER"
 
     final_sales_df.write.mode("append").save_as_table(new_table_name)
- 
+
 
 if __name__ == '__main__':
     main()
