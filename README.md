@@ -1,6 +1,6 @@
 # Amazon Sales Data Processing with Snowflake and Snowpark
 
-This project involves processing Amazon sales data from multiple regions (India, USA, France) using Snowflake's Snowpark library. The goal is to create a clean, organized data warehouse with a star schema structure, which can be used for further analysis, visualization, and machine learning tasks. The fact table is the `Sales` table, and the associated dimension tables provide details for various aspects such as dates, customers, payments, products, promotional codes, and regions.
+This project demonstrates the processing of Amazon sales data from multiple regions (India, USA, France) using Snowflake's Snowpark library. The objective is to create a structured data warehouse with a star schema for use in further analysis, visualization, and machine learning tasks. The `Sales` table serves as the fact table, connected to various dimension tables providing additional details such as dates, customers, payments, products, promotional codes, and regions.
 
 ## Table of Contents
 
@@ -15,41 +15,47 @@ This project involves processing Amazon sales data from multiple regions (India,
 
 ## Overview
 
-This repository demonstrates a data engineering workflow using Snowflake's Snowpark API to process and transform sales data from Amazon. By following a star schema, it enables efficient querying and analysis of large datasets. This setup is optimized for downstream tasks like visualization and data science applications.
+This repository provides a data engineering workflow utilizing Snowflake's Snowpark API for the processing and transformation of Amazon sales data. The resulting star schema design allows efficient data querying, optimized for visualization and data science applications.
 
 ## Data Sources
 
-The project utilizes three folders, each containing sales data for a specific region:
-- `india/` (India - folder of CSV files)
-- `usa/` (USA - folder of Parquet files)
-- `france/` (France - folder of JSON files)
+The project utilizes three directories, each containing sales data for a specific region:
+- `data/india/`: Contains CSV files of India sales data.
+- `data/usa/`: Contains Parquet files of USA sales data.
+- `data/france/`: Contains JSON files of France sales data.
 
-Each folder contains files with information on individual sales transactions, including customer details, payment methods, product information, and promotional codes used.
+Each directory includes information on individual sales transactions, including customer details, payment methods, product information, and promotional codes.
 
 ## Project Structure
 
 ```plaintext
 .
 ├── data/
-│   ├── india/
-│   │   ├── file1.csv
-│   │   ├── file2.csv
-│   │   └── ...
-│   ├── usa/
-│   │   ├── file1.parquet
-│   │   ├── file2.parquet
-│   │   └── ...
-│   └── france/
-│       ├── file1.json
-│       ├── file2.json
-│       └── ...
-├── scripts/
-│   ├── data_processing.py
-│   └── create_tables.sql
+│   ├── india/            # Contains CSV files
+│   ├── usa/              # Contains Parquet files
+│   └── france/           # Contains JSON files
+├── python/               # Contains Python scripts for data processing
+│   ├── 1_connectivity.py               # Establishes connection to Snowflake
+│   ├── 2_stg_to_source.py               # Loads staging data to source tables
+│   ├── 3_currency_stg.py                # Handles currency staging processes
+│   ├── 4_currency_stg_to_source.py      # Moves currency data to source tables
+│   ├── 5_currency_processing.py          # Processes currency data
+│   ├── 6_source_to_curated.py            # Moves data from source to curated layer
+│   ├── 7_source_to_curated_fr.py         # Moves French data to curated layer
+│   ├── 8_source_to_curated_us.py         # Moves USA data to curated layer
+│   └── _final_process.py                 # Final processing script
+├── sql/                   # Contains SQL scripts for table creation and queries
+│   ├── 1_initial_creations_sf.sql         # Initial table and schema creations
+│   ├── 2_file_formats.sql                 # SQL for managing different file formats
+│   ├── 3_exchange_rate_processing.sql     # Processing exchange rates
+│   ├── 4_data_ingestion_source.sql        # Data ingestion SQL for source tables
+│   ├── 5_curated_layer.sql                # SQL for creating curated data layer
+│   ├── 6_consumption_layer.sql            # SQL for creating consumption layer
+│   └── 7_stg_local.sql                    # Local staging table creation
 ├── README.md
 └── requirements.txt
 
-##Data Processing
+## Data Processing
 
 Using Snowflake and the Snowpark library, the data processing workflow involves several steps:
 
