@@ -55,20 +55,3 @@ Each directory includes information on individual sales transactions, including 
 ├── README.md
 └── requirements.txt
 
-## Data Processing
-
-Using Snowflake and the Snowpark library, the data processing workflow involves several steps:
-
-1. Data Ingestion: Import data from the three folders (CSV, Parquet, and JSON) into Snowflake.
-2. Cleaning and Transformation:
- * Format dates, standardize data types, and remove duplicates.
- * Handle missing values.
-3. Creating Dimension Tables:
- * Date Dimension: Includes date, day, week, month, quarter, and year fields.Customer Details Dimension: Contains customer information such as ID, name, email, and contact.
- * Payment Details Dimension: Holds payment method details.
- * Product Details Dimension: Includes product ID, name, category, and price.
- * Promo Code Details Dimension: Contains promo codes and their discount values.
- * Region Details Dimension: Includes region-based information.
-4. Creating Fact Table:
- * The Sales Fact Table is created to link each transaction to the associated dimension tables. It includes transaction-specific information like sales amount, product quantity, promo codes, etc.
-5. Loading Data: Populate each table with the cleaned data.
