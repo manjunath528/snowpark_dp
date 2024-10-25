@@ -9,9 +9,7 @@ This project demonstrates the processing of Amazon sales data from multiple regi
 - [Project Structure](#project-structure)
 - [Data Processing](#data-processing)
 - [Database Design](#database-design)
-- [Getting Started](#getting-started)
 - [Future Steps](#future-steps)
-- [License](#license)
 
 ## Overview
 
@@ -54,4 +52,99 @@ Each directory includes information on individual sales transactions, including 
 │   └── 7_stg_local.sql                    # Local staging table creation
 ├── README.md
 └── requirements.txt
+.
+```
+
+
+## Data Processing
+
+Using Snowflake and the Snowpark library, the data processing workflow involves several steps:
+
+- Data Ingestion: Import data from the three folders (CSV, Parquet, and JSON) into Snowflake.
+- Cleaning and Transformation:
+   - Format dates, standardize data types, and remove duplicates.
+   - Handle missing values.
+- Creating Dimension Tables:
+   - Date Dimension: Includes fields for date, day, week, month, quarter, and year.
+   - Customer Details Dimension: Contains customer information, including ID, name, email, and contact.
+   - Payment Details Dimension: Holds payment method details.
+   - Product Details Dimension: Includes product ID, name, category, and price.
+   - Promo Code Details Dimension: Contains promo codes and their discount values.
+   - Region Details Dimension: Includes region-based information.
+- Creating Fact Table:
+   - The Sales Fact Table links each transaction to the associated dimension tables, including transaction-specific information like sales amount, product quantity, and promo codes.
+- Loading Data: Populate each table with the cleaned data.
+  
+## Database Design
+
+This project follows a star schema design, with a central Sales fact table linked to various dimension tables. This structure facilitates efficient querying for both visualization and data science applications.
+                
+                 
+  # Star Schema Diagram
+```plaintext
+                 +---------------+
+                 |    Date       |
+                 +---------------+
+                 | Date_ID       |<------------------+
+                 | Day           |                   |
+                 | Week          |                   |
+                 | Month         |                   |
+                 | Quarter       |                   |
+                 | Year          |                   |
+                 +---------------+                   |
+                        |                              |
+                        |                              |
+                 +---------------+                     |
+                 |   Customer    |                     |
+                 +---------------+                     |
+                 | Customer_ID   |                     |
+                 | Name          |                     |
+                 | Email         |                     |
+                 | Contact       |                     |
+                 +---------------+                     |
+                        |                              |
+                        |                              |
+                 +---------------+                     |
+                 |    Sales      |                     |
+                 +---------------+                     |
+                 | Sales_ID      |                     |
+                 | Date_ID       |-------------------+
+                 | Customer_ID   |
+                 | Amount        |
+                 | Quantity      |
+                 | Promo_Code_ID |
+                 | Product_ID    |
+                 | Payment_ID    |
+                 | Region_ID     |
+                 +---------------+
+                        |
+                        |
+      +------------+--------+-----------+
+      |            |        |           |
+      |            |        |           |
+ +------+    +---------+  +---------+  +---------+
+ |Region|    | Product |  | Payment |  | Promo   |
+ +------+    +---------+  +---------+  +---------+
+ | Region_ID   | Product_ID | Payment_ID | Promo_Code_ID |
+ | Region_Name | Name       | Method      | Discount      |
+ | ...         | Category   | ...        | ...           |
+ +------+    +---------+  +---------+  +---------+
+
+```
+
+- Fact Table: Sales
+- Dimension Tables: Date, Customer, Payment, Product, Promo, Region
+
+
+
+## Future Steps
+
+- Data Visualization: Use tools like Tableau, PowerBI, or Snowflake's native features for visualization.
+- Data Science Applications: Implement predictive modeling, customer segmentation, and trend analysis using this structured data.
+- Optimization: Refine SQL queries and Snowpark transformations for enhanced performance.
+
+
+
+
+
 
